@@ -185,7 +185,7 @@ const getStoryByIdHandler = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid story ID provided' });
     }
 
-    const story = await getStoryByIdDb(id);
+    const story = await getStoryByIdDb(id as string);
     if (!story) return res.status(404).json({ error: 'Story not found' });
     res.json({ story });
   } catch (error) {
@@ -202,7 +202,7 @@ const updateStoryHandler = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid story ID provided' });
     }
 
-    const updated = await updateStoryDb(id, req.body);
+    const updated = await updateStoryDb(id as string, req.body);
 
     if (!updated) {
       return res.status(404).json({ error: 'Story not found' });
@@ -223,7 +223,7 @@ const deleteStoryHandler = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid story ID provided' });
     }
 
-    const deleted = await deleteStoryDb(id);
+    const deleted = await deleteStoryDb(id as string);
 
     if (!deleted) {
       return res.status(404).json({ error: 'Story not found' });
@@ -244,7 +244,7 @@ const approveStoryHandler = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid story ID provided' });
     }
 
-    const approved = await approveStoryDb(id);
+    const approved = await approveStoryDb(id as string);
 
     if (!approved) {
       return res.status(404).json({ error: 'Story not found' });

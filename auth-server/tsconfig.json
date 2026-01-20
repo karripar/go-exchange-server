@@ -9,7 +9,7 @@
     "noImplicitAny": true,
     "strict": true,
     "skipLibCheck": true,
-    "types": ["jest", "node", "express"],
+    "types": ["jest", "node", "express"]
   },
   // "include": ["./*.js", "src/**/*.ts", "test/**/*.ts","src/**/*.d.ts", "src/types/**/*.d.ts"],
   "include": ["src", "test"],

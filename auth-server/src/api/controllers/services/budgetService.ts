@@ -106,9 +106,9 @@ export const getUserBudget = async (req: Request, res: Response, next: NextFunct
       });
     }
 
-    const query: { userId: string; destination?: string | string[] } = { userId };
+    const query: { userId: string; destination?: string } = { userId: Array.isArray(userId) ? userId[0] : userId };
     if (destination) {
-      query.destination = destination as string;
+      query.destination = Array.isArray(destination) ? destination.join(", ") : destination as string;
     }
 
     let budget;
