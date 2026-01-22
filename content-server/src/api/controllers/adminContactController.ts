@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import AdminContact from "../models/adminContactModel";
-import CustomError from "../../classes/CustomError";
-
+import {Request, Response, NextFunction} from 'express';
+import AdminContact from '../models/adminContactModel';
+import CustomError from '../../classes/CustomError';
+import userModel from '../models/userModel';
 
 /**
  * @module controllers/adminContactController
@@ -27,11 +27,26 @@ import CustomError from "../../classes/CustomError";
  */
 const getContacts = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const contacts = await AdminContact.find().sort({ createdAt: -1 });
-    res.status(200).json({ contacts });
+    const contacts = await AdminContact.find().sort({position: 1}).lean();
+
+    const emails = contacts.map((c) => c.email);
+
+    const users = await userModel
+      .find({email: {$in: emails}})
+      .select('email avatarUrl')
+      .lean();
+
+    const userMap = new Map(users.map((u) => [u.email, u.avatarUrl]));
+
+    const enrichedContacts = contacts.map((contact) => ({
+      ...contact,
+      avatarUrl: userMap.get(contact.email) || null,
+    }));
+
+    res.status(200).json({contacts: enrichedContacts});
   } catch (error) {
-    console.error("Error fetching admin contacts:", error);
-    next(new CustomError("Failed to fetch contacts", 500));
+    console.error('Error fetching admin contacts:', error);
+    next(new CustomError('Failed to fetch contacts', 500));
   }
 };
 
@@ -55,30 +70,30 @@ const getContacts = async (req: Request, res: Response, next: NextFunction) => {
  * addContact(req, res, next);
  */
 const addContact = async (
-  req: Request<{}, {}, { name: string; title: string; email: string }>,
+  req: Request<{}, {}, {name: string; title: string; email: string}>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const user = res.locals.user;
-    if (!user) return next(new CustomError("Unauthorized, no user found", 401));
+    if (!user) return next(new CustomError('Unauthorized, no user found', 401));
     if (![2, 3].includes(user.user_level_id))
-      return next(new CustomError("Forbidden, not an admin", 403));
+      return next(new CustomError('Forbidden, not an admin', 403));
 
-    const { name, title, email } = req.body;
+    const {name, title, email} = req.body;
     if (!name || !title || !email) {
-      return next(new CustomError("All fields are required", 400));
+      return next(new CustomError('All fields are required', 400));
     }
 
-    const newContact = new AdminContact({ name, title, email });
+    const newContact = new AdminContact({name, title, email});
     await newContact.save();
 
     res
       .status(201)
-      .json({ message: "Admin contact added successfully", contact: newContact });
+      .json({message: 'Admin contact added successfully', contact: newContact});
   } catch (error) {
-    console.error("Error adding admin contact:", error);
-    next(new CustomError("Failed to add contact", 500));
+    console.error('Error adding admin contact:', error);
+    next(new CustomError('Failed to add contact', 500));
   }
 };
 
@@ -103,17 +118,21 @@ const addContact = async (
  * updateContact(req, res, next);
  */
 const updateContact = async (
-  req: Request<{ id: string }, {}, { name?: string; title?: string; email?: string }>,
+  req: Request<
+    {id: string},
+    {},
+    {name?: string; title?: string; email?: string}
+  >,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const user = res.locals.user;
-    if (!user) return next(new CustomError("Unauthorized, no user found", 401));
+    if (!user) return next(new CustomError('Unauthorized, no user found', 401));
     if (![2, 3].includes(user.user_level_id))
-      return next(new CustomError("Forbidden, not an admin", 403));
+      return next(new CustomError('Forbidden, not an admin', 403));
 
-    const { id } = req.params;
+    const {id} = req.params;
     const updates = req.body;
 
     const updatedContact = await AdminContact.findByIdAndUpdate(id, updates, {
@@ -122,16 +141,16 @@ const updateContact = async (
     });
 
     if (!updatedContact) {
-      return next(new CustomError("Contact not found", 404));
+      return next(new CustomError('Contact not found', 404));
     }
 
     res.status(200).json({
-      message: "Contact updated successfully",
+      message: 'Contact updated successfully',
       contact: updatedContact,
     });
   } catch (error) {
-    console.error("Error updating admin contact:", error);
-    next(new CustomError("Failed to update contact", 500));
+    console.error('Error updating admin contact:', error);
+    next(new CustomError('Failed to update contact', 500));
   }
 };
 
@@ -154,30 +173,60 @@ const updateContact = async (
  * deleteContact(req, res, next);
  */
 const deleteContact = async (
-  req: Request<{ id: string }>,
+  req: Request<{id: string}>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const user = res.locals.user;
-    if (!user) return next(new CustomError("Unauthorized, no user found", 401));
+    if (!user) return next(new CustomError('Unauthorized, no user found', 401));
     if (![2, 3].includes(user.user_level_id))
-      return next(new CustomError("Forbidden, not an admin", 403));
+      return next(new CustomError('Forbidden, not an admin', 403));
 
-    const { id } = req.params;
+    const {id} = req.params;
     const deletedContact = await AdminContact.findByIdAndDelete(id);
 
     if (!deletedContact) {
-      return next(new CustomError("Contact not found", 404));
+      return next(new CustomError('Contact not found', 404));
     }
 
     res
       .status(200)
-      .json({ success: true, message: "Contact deleted successfully" });
+      .json({success: true, message: 'Contact deleted successfully'});
   } catch (error) {
-    console.error("Error deleting admin contact:", error);
-    next(new CustomError("Failed to delete contact", 500));
+    console.error('Error deleting admin contact:', error);
+    next(new CustomError('Failed to delete contact', 500));
   }
 };
 
-export { getContacts, addContact, updateContact, deleteContact };
+
+const reorderContacts = async (
+  req: Request<{}, {}, {orderedIds: string[]}>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = res.locals.user;
+    if (!user) return next(new CustomError('Unauthorized, no user found', 401));
+    if (![2, 3].includes(user.user_level_id))
+      return next(new CustomError('Forbidden, not an admin', 403));
+
+    const {orderedIds} = req.body;
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+      return next(new CustomError('Invalid ordered IDs array', 400));
+    }
+
+    // Update each contact's position based on the new order
+    for (let index = 0; index < orderedIds.length; index++) {
+      const id = orderedIds[index];
+      await AdminContact.findByIdAndUpdate(id, {position: index});
+    }
+
+    res.status(200).json({message: 'Contacts reordered successfully'});
+  } catch (error) {
+    console.error('Error reordering admin contacts:', error);
+    next(new CustomError('Failed to reorder contacts', 500));
+  }
+};
+
+export {getContacts, addContact, updateContact, deleteContact, reorderContacts};

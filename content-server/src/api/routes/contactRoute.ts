@@ -6,6 +6,7 @@ import {
   addContact,
   updateContact,
   deleteContact,
+  reorderContacts,
 } from "../controllers/adminContactController";
 
 const router = express.Router();
@@ -248,5 +249,58 @@ router
     authenticate,
     deleteContact
   );
+
+router.post(
+    /**
+     * @api {post} /contact/contacts/reorder Reorder admin contacts
+     * @apiName ReorderAdminContacts
+     * @apiGroup AdminContactGroup
+     * @apiVersion 1.0.0
+     *
+     * @apiDescription Reorders admin contacts based on provided list of IDs. Only accessible to admins.
+     * @apiPermission token
+     *
+     * @apiBody {String[]} orderedIds Array of contact IDs in the desired order.
+     *
+     * @apiSuccess {String} message Success message indicating that the contacts were reordered successfully.
+     * @apiSuccessExample {json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "message": "Contacts reordered successfully"
+     *     }
+     *
+     * @apiError (400 Bad Request) BadRequest Invalid input data.
+     * @apiErrorExample {json} BadRequest-Response:
+     *    HTTP/1.1 400 Bad Request
+     *   {
+     *    "message": "Invalid ordered IDs array"
+     *  }
+     *
+     * @apiError (401 Unauthorized) Unauthorized Missing or invalid authentication token.
+     * @apiErrorExample {json} Unauthorized-Response:
+     *     HTTP/1.1 401 Unauthorized
+     *     {
+     *       "message": "Unauthorized"
+     *     }
+     *
+     * @apiError (403 Forbidden) Forbidden User not authorized to perform this action.
+     * @apiErrorExample {json} Forbidden-Response:
+     *     HTTP/1.1 403 Forbidden
+     *     {
+     *       "message": "Forbidden, not an admin"
+     *     }
+     * @apiError (500 Internal Server Error) InternalServerError Server error while processing the request.
+     * @apiErrorExample {json} InternalServerError-Response:
+     *     HTTP/1.1 500 Internal Server Error
+     *     {
+     *       "message": "Failed to reorder contacts"
+     *     }
+     */
+    "/contacts/reorder",
+    body("orderedIds").isArray({ min: 1 }).withMessage("orderedIds must be a non-empty array"),
+    validationErrors,
+    authenticate,
+    reorderContacts
+);
 
 export default router;
