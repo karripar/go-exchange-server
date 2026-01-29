@@ -7,6 +7,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IAdminContact extends Document {
   name: string;
   title: string;
+  campus?: string;
   email: string;
   createdAt: Date;
   updatedAt: Date;
@@ -19,6 +20,7 @@ const AdminContactSchema = new Schema<IAdminContact>(
   {
     name: { type: String, required: true, trim: true },
     title: { type: String, required: true, trim: true },
+    campus: { type: String, required: false, trim: true },
     email: { type: String, required: true, trim: true},
     position: { type: Number, default: 0 }, // Optional field for ordering contacts
     user: { type: Schema.Types.ObjectId, ref: 'User', required: false }, // Reference to User model (optional)

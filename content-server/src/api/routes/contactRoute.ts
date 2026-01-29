@@ -57,6 +57,7 @@ router
      *           "_id": "unique_contact_id",
      *           "name": "John Doe",
      *           "title": "Exchange Coordinator",
+     *           "campus": "Main Campus",
      *           "email": "john@example.com",
      *           "createdAt": "2024-01-01T00:00:00.000Z"
      *         }
@@ -96,6 +97,7 @@ router
      *         "_id": "unique_contact_id",
      *         "name": "John Doe",
      *         "title": "Coordinator",
+     *         "campus": "Main Campus",
      *         "email": "john@example.com"
      *       }
      *     }
@@ -161,6 +163,7 @@ router
      *         "_id": "unique_contact_id",
      *         "name": "Jane Doe",
      *         "title": "Program Advisor",
+     *         "campus": "Main Campus",
      *         "email": "jane@example.com"
      *       }
      *     }

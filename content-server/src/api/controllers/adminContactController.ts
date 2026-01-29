@@ -70,7 +70,7 @@ const getContacts = async (req: Request, res: Response, next: NextFunction) => {
  * addContact(req, res, next);
  */
 const addContact = async (
-  req: Request<{}, {}, {name: string; title: string; email: string}>,
+  req: Request<{}, {}, {name: string; title: string; campus: string; email: string}>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -80,12 +80,12 @@ const addContact = async (
     if (![2, 3].includes(user.user_level_id))
       return next(new CustomError('Forbidden, not an admin', 403));
 
-    const {name, title, email} = req.body;
+    const {name, title, campus, email} = req.body;
     if (!name || !title || !email) {
       return next(new CustomError('All fields are required', 400));
     }
 
-    const newContact = new AdminContact({name, title, email});
+    const newContact = new AdminContact({name, title, campus, email});
     await newContact.save();
 
     res
@@ -200,6 +200,24 @@ const deleteContact = async (
 };
 
 
+/** * @function reorderContacts
+ * @description Reorders admin contacts based on provided array of IDs. Only accessible to admins.
+ *
+ * @param {Request<{}, {}, { orderedIds: string[] }>} req - Express request containing ordered array of contact IDs.
+ * @param {Response} res - Express response object.
+ * @param {NextFunction} next - Express next middleware for error handling.
+ *
+ * @returns {Promise<void>} Responds with:
+ * - 200: When contacts are successfully reordered.
+ * - 400: If invalid data.
+ * - 401/403: If unauthorized.
+ * - 500: On server error.
+ *
+ * @example
+ * // POST /api/v1/contact/contacts/reorder
+ * // Body: { orderedIds: ["id1", "id2", "id3"] }
+ * reorderContacts(req, res, next);
+ */
 const reorderContacts = async (
   req: Request<{}, {}, {orderedIds: string[]}>,
   res: Response,
