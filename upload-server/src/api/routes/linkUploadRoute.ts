@@ -1,6 +1,7 @@
 import express from 'express';
 import { addDocumentLink, validateDocumentLink,
-getPlatformInstructions, getDocuments, addApplicationDocumentLink} from "../controllers/linkuploadController";
+getPlatformInstructions, getDocuments, deleteDocumentLink } from "../controllers/linkuploadController";
+import { authenticate } from '../../middlewares';
 //import { authenticate } from '../../middlewares';
 
 /**
@@ -179,72 +180,42 @@ router.post(
    * @apiUse unauthorized
    */
   '/documents/link',
+  authenticate,
   addDocumentLink
 );
 
-router.post(
+router.delete(
   /**
-   * @api {post} /linkUploads/documents Add application document link
-   * @apiName AddApplicationDocumentLink
+   * @api {delete} /linkUploads/documents/:id Delete document link
+   * @apiName DeleteDocumentLink
    * @apiGroup LinkUploadGroup
    * @apiVersion 1.0.0
-   * @apiDescription Add a document link for application phase
+   * @apiDescription Delete a document link by its ID
    * @apiPermission token
    *
    * @apiUse token
    *
-   * @apiBody {String} userId User ID (required)
-   * @apiBody {String} applicationId Application ID (required)
-   * @apiBody {String} phase Application phase
-   * @apiBody {String} documentType Document type
-   * @apiBody {String} fileName File name
-   * @apiBody {String} fileUrl File URL
-   * @apiBody {String} sourceType Source platform type (google_drive, onedrive, dropbox, icloud, other_url, checkbox)
-   * @apiBody {String} [notes] Optional notes
+   * @apiParam {String} id Document ID to delete
    *
-   * @apiSuccess (201) {String} _id Document ID
-   * @apiSuccess (201) {String} userId User ID who added the document
-   * @apiSuccess (201) {String} name Document name (fileName)
-   * @apiSuccess (201) {String} url Document URL (fileUrl)
-   * @apiSuccess (201) {String} sourceType Source platform type
-   * @apiSuccess (201) {String} addedAt Date when document was added
-   * @apiSuccess (201) {Boolean} isAccessible Whether document is accessible
-   * @apiSuccess (201) {String} accessPermission Access permission level
-   * @apiSuccess (201) {String} [notes] Document notes
-   * @apiSuccess (201) {String} applicationId Application ID
-   * @apiSuccess (201) {String} applicationPhase Application phase
-   * @apiSuccess (201) {String} documentType Document type
-   * @apiSuccess (201) {String} addedBy User ID who added the document
+   * @apiSuccess (200) {String} message Success message
    *
    * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 201 Created
+   * HTTP/1.1 200 OK
    * {
-   *  "_id": "doc123",
-   *  "userId": "123",
-   *  "name": "Passport.pdf",
-   *  "url": "https://drive.google.com/...",
-   *  "sourceType": "google_drive",
-   *  "addedAt": "2025-11-29T10:00:00.000Z",
-   *  "isAccessible": true,
-   *  "accessPermission": "public",
-   *  "notes": null,
-   *  "applicationId": "app123",
-   *  "applicationPhase": "preparation",
-   *  "documentType": "identification",
-   *  "addedBy": "123"
+   *  "message": "Document link deleted successfully"
    * }
    *
-   * @apiError (400) {String} BadRequest Missing required fields or invalid source type
-   * @apiErrorExample {json} BadRequest:
+   * @apiError (404) {String} NotFound Document link not found
+   * @apiErrorExample {json} NotFound:
    * {
-   *  "message": "Missing required fields",
-   *  "details": "applicationId is required to link document to application"
+   *  "message": "Document link not found"
    * }
    *
    * @apiUse unauthorized
    */
-  '/documents',
-  addApplicationDocumentLink
+  '/documents/:id',
+  authenticate,
+  deleteDocumentLink
 );
 
 

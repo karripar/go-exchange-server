@@ -71,21 +71,7 @@ const authenticate = async (
       return;
     }
 
-    // set user info from token
-    // Coerce user_level_id to a number to avoid string/number mismatches
-    const rawLevel = (decoded as unknown as { user_level_id?: string | number }).user_level_id;
-    let userLevelNumber: number | null = null;
-    if (typeof rawLevel === 'string') {
-      const parsed = parseInt(rawLevel, 10);
-      userLevelNumber = Number.isNaN(parsed) ? null : parsed;
-    } else if (typeof rawLevel === 'number') {
-      userLevelNumber = rawLevel;
-    }
-
-    res.locals.user = {
-      id: decoded._id,
-      user_level_id: userLevelNumber,
-    };
+    res.locals.user = user;
 
     next();
   } catch (error) {

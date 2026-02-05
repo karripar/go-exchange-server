@@ -62,7 +62,10 @@ const addDocumentLink = async (
   next: NextFunction
 ) => {
   try {
-    const {userId, name, url, sourceType, notes} = req.body;
+    const { name, url, sourceType, notes} = req.body;
+
+    const userId = res.locals.user._id;
+    console.log(userId, 'is adding a document link:', {name, url, sourceType, notes});
 
     if (!userId) {
       return res.status(401).json({
@@ -120,89 +123,38 @@ const addDocumentLink = async (
   }
 };
 
-// Adding a link
-const addApplicationDocumentLink = async (
+
+const deleteDocumentLink = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const {userId, applicationId, phase, documentType, fileName, fileUrl, sourceType, notes} =
-      req.body;
+    const { id } = req.params;
 
-    if (!userId) {
-      return res.status(401).json({
-        error: 'User authentication required',
-        details: 'userId is required',
-      });
+    const userId = res.locals.user._id;
+    console.log(userId, 'is deleting document link:', id);
+
+    const doc = await LinkDocument.findById(id);
+    if (!doc) {
+      return res.status(404).json({ error: 'Document not found' });
     }
 
-    if (!applicationId) {
-      return res.status(400).json({
-        error: 'Missing required fields',
-        details: 'applicationId is required to link document to application',
-      });
+    console.log(doc.userId + ' vs ' + userId);
+
+    if (doc.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ error: 'Forbidden: You can only delete your own documents' });
     }
 
-    if (!phase || !documentType || !fileUrl || !sourceType) {
-      return res.status(400).json({
-        error: 'Missing required fields',
-        details: 'phase, documentType, fileUrl, and sourceType are required',
-      });
-    }
-
-    if (!validateSourceType(sourceType)) {
-      return res.status(400).json({
-        error: 'Invalid source type',
-        validTypes: [
-          'google_drive',
-          'onedrive',
-          'dropbox',
-          'icloud',
-          'other_url',
-          'checkbox',
-        ],
-      });
-    }
-
-    // Validate URL format only for non-checkbox tasks
-    if (sourceType !== 'checkbox' && !isValidUrl(fileUrl)) {
-      return res.status(400).json({
-        error: 'Invalid file URL format',
-        details: 'Must be a valid URL for document uploads',
-      });
-    }
-
-    if (!fileName) {
-      return res.status(400).json({
-        error: 'Missing required fields',
-        details: 'fileName is required',
-      });
-    }
-
-    const applicationDocumentLink = {
-      userId,
-      name: fileName,
-      url: fileUrl,
-      sourceType,
-      addedAt: new Date().toISOString(),
-      isAccessible: true,
-      accessPermission: 'public',
-      notes: notes || null,
-      applicationId,
-      applicationPhase: phase,
-      documentType,
-      addedBy: userId,
-    };
-
-    const saved = await LinkDocument.create(applicationDocumentLink);
-    console.log('Application document saved:', saved._id, 'userId:', saved.userId);
-    res.status(201).json(saved);
+    await LinkDocument.findByIdAndDelete(id);
+    console.log('Document deleted:', id);
+    res.status(204).send();
   } catch (error) {
-    console.error('Error in addApplicationDocumentLink:', error);
+    console.error('Error in deleteDocumentLink:', error);
     next(error);
   }
 };
+
 
 // Validating a link URL
 const validateDocumentLink = async (
@@ -297,7 +249,7 @@ const getPlatformInstructions = async (
 export {
   getDocuments,
   addDocumentLink,
-  addApplicationDocumentLink,
   validateDocumentLink,
   getPlatformInstructions,
+  deleteDocumentLink,
 };
