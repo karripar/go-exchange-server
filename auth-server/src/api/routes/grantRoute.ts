@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {getErasmusGrantTypes, applyForErasmusGrant, updateErasmusGrant, getUserErasmusGrants,
   applyForKelaSupport, updateKelaSupport, getKelaSupport,
-  calculateTotalGrants, searchGrants, getAllGrantsSummary, getBudgetCategories,} from "../controllers/profileController";
+  calculateTotalGrants, searchGrants, getAllGrantsSummary } from "../controllers/profileController";
 import { authenticate } from "../../middlewares";
 
 /**
@@ -29,29 +29,6 @@ import { authenticate } from "../../middlewares";
 
 const router = Router();
 
-router.get(
-  /**
-   * @api {get} /grants/budget/categories Get budget categories for grants
-   * @apiName GetGrantBudgetCategories
-   * @apiGroup GrantsGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Retrieve budget categories relevant to grant applications
-   * @apiPermission none
-   *
-   * @apiSuccess (200) {Object[]} categories List of budget categories
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 200 OK
-   * [
-   *  {
-   *    "id": "travel",
-   *    "name": "Travel Expenses"
-   *  }
-   * ]
-   */
-  "/budget/categories",
-  getBudgetCategories
-);
 
 router.get(
   /**

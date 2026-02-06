@@ -1,5 +1,5 @@
 ﻿import { Router } from "express";
-import { addFavorite, removeFavorite, addDocument, removeDocument, updateProfile } from "../controllers/profileController";
+import { addFavorite, removeFavorite, updateProfile } from "../controllers/profileController";
 import { authenticate } from "../../middlewares";
 
 /**
@@ -102,82 +102,6 @@ router.delete(
   removeFavorite
 );
 
-router.post(
-  /**
-   * @api {post} /profile/documents Add document
-   * @apiName AddDocument
-   * @apiGroup ProfileGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Add a document to user's profile
-   * @apiPermission token
-   *
-   * @apiUse token
-   *
-   * @apiBody {String} name Document name
-   * @apiBody {String} type Document type
-   * @apiBody {String} url Document URL
-   * @apiBody {String} [description] Optional description
-   *
-   * @apiSuccess (201) {Object} document Created document object
-   * @apiSuccess (201) {String} document.id Document ID
-   * @apiSuccess (201) {String} document.name Document name
-   * @apiSuccess (201) {String} document.url Document URL
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 201 Created
-   * {
-   *  "id": "doc123",
-   *  "name": "Passport",
-   *  "type": "identification",
-   *  "url": "https://..."
-   * }
-   *
-   * @apiError (400) {String} BadRequest Missing required fields
-   * @apiErrorExample {json} BadRequest:
-   * {
-   *  "message": "Missing required fields"
-   * }
-   *
-   * @apiUse unauthorized
-   */
-  "/documents",
-  authenticate,
-  addDocument
-);
-
-router.delete(
-  /**
-   * @api {delete} /profile/documents/:docId Remove document
-   * @apiName RemoveDocument
-   * @apiGroup ProfileGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Remove a document from user's profile
-   * @apiPermission token
-   *
-   * @apiUse token
-   *
-   * @apiParam {String} docId Document's unique ID
-   *
-   * @apiSuccess (200) {String} message Success message
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 200 OK
-   * {
-   *  "message": "Document removed successfully"
-   * }
-   *
-   * @apiUse unauthorized
-   *
-   * @apiError (404) {String} NotFound Document not found
-   * @apiErrorExample {json} NotFound:
-   * {
-   *  "message": "Document not found"
-   * }
-   */
-  "/documents/:docId",
-  authenticate,
-  removeDocument
-);
 
 router.put(
   /**
