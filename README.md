@@ -1,10 +1,10 @@
 # VA Backend Documentation 
 
-Backend repository for the **Vaihtoaktivaattori** project (Media Service Project course). <br>
+Backend repository for the **Go Exchange** project (Metropolia Software Factory). <br>
 
-**[Frontend Repository](https://github.com/karripar/va-frontend)**<br>
+**[Frontend Repository](https://github.com/karripar/go-exchange-client)**<br>
 **[AI Chat Service Repository](https://github.com/samukan/va-chat-service)**<br>
-**[TypeScript Hybrid Types Module](https://github.com/karripar/va-hybrid-types)**
+**[TypeScript Hybrid Types Module](https://github.com/karripar/go-exchange-types)**
 
 ---
 
