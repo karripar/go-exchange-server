@@ -26,6 +26,7 @@ jobs:
       NODE_ENV: test
       PORT: 3001
       DB_URL: mongodb://localhost:27017/vaihtoaktivaattori
+      DB_TEST_URL: mongodb://localhost:27017/va-test
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       
@@ -62,6 +63,7 @@ jobs:
       NODE_ENV: test
       PORT: 3002
       DB_URL: mongodb://localhost:27017/vaihtoaktivaattori
+      DB_TEST_URL: mongodb://localhost:27017/va-test
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       AUTH_SERVER: ${{ secrets.AUTH_SERVER }}
@@ -100,6 +102,7 @@ jobs:
       NODE_ENV: test
       PORT: 3003
       DB_URL: mongodb://localhost:27017/vaihtoaktivaattori
+      DB_TEST_URL: mongodb://localhost:27017/va-test
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
     steps:
