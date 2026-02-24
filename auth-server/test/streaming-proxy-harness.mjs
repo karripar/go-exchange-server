@@ -13,6 +13,9 @@ const __dirname = dirname(__filename);
 
 const VERBOSE = process.env.STREAM_TEST_VERBOSE === '1';
 const VERIFY_TIMEOUT_MS = Number(process.env.STREAM_TEST_TIMEOUT_MS || 30000);
+const VERIFIER_MODE = process.argv.includes('--verifier=e2e')
+  ? 'e2e'
+  : process.env.STREAM_TEST_VERIFIER_MODE || 'legacy';
 
 function log(message, details) {
   if (!VERBOSE) {
@@ -148,7 +151,11 @@ process.on('SIGINT', shutdown);
 
 function runVerifier(authPort) {
   return new Promise((resolve, reject) => {
-    const verifierPath = join(__dirname, 'streaming-verifier.mjs');
+    const verifierFile =
+      VERIFIER_MODE === 'e2e'
+        ? 'streaming-proxy-e2e-verifier.mjs'
+        : 'streaming-verifier.mjs';
+    const verifierPath = join(__dirname, verifierFile);
     const child = spawn(process.execPath, [verifierPath], {
       cwd: process.cwd(),
       env: {
