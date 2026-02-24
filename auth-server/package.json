@@ -11,6 +11,7 @@
     "test": "jest --detectOpenHandles --forceExit",
     "test:stream": "node ./test/streaming-verifier.mjs",
     "test:stream:proxy": "node ./test/streaming-proxy-harness.mjs",
+    "test:stream:proxy:e2e": "node ./test/streaming-proxy-harness.mjs --verifier=e2e",
     "postbuild": "npm run docs",
     "apidoc": "apidoc -i src/api/routes/ -o apidocs/",
     "typedoc": "typedoc --options typedoc.json",
