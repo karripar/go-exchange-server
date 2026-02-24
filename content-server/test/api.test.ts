@@ -51,7 +51,7 @@ describe("Admin Contact Information API Tests", () => {
   let contactId: string;
 
   beforeAll(async () => {
-    const mongoURI = process.env.DB_URL;
+    const mongoURI = process.env.DB_TEST_URL;
     if (!mongoURI) throw new Error("Missing DB_URL in environment variables");
     await mongoose.connect(mongoURI);
 

@@ -13,6 +13,7 @@ import {
   toggleBlockUser,
   getBlockedUsers,
 } from './controllers/testUsers';
+import { addFavorite, removeFavorite } from './controllers/testFavorites';
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ describe('User related tests', () => {
   let testAdminToken: string;
 
   beforeAll(async () => {
-    const mongoURI = process.env.DB_URL;
+    const mongoURI = process.env.DB_TEST_URL;
     if (!mongoURI) throw new Error('Missing DB_URL in environment variables');
     await mongoose.connect(mongoURI);
 
@@ -73,6 +74,16 @@ describe('User related tests', () => {
   it('should search users by email', async () => {
     const res = await searchUsersByEmail(app, testUser.email, testAdminToken);
     expect(res.users?.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('Should add a favorite destination for the user', async () => {
+    const destinationName = 'Test Destination';
+    await addFavorite(app, testToken, destinationName);
+  });
+
+  it('Should remove a favorite destination for the user', async () => {
+    const destinationName = 'Test Destination';
+    await removeFavorite(app, testToken, destinationName);
   });
 
   it('should toggle block status of a user', async () => {

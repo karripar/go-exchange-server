@@ -1,29 +1,46 @@
-// placeholder test controller for development guideline
-
-/* import {Express} from 'express';
-import request from 'supertest';
+import request from "supertest";
+import { Application } from "express";
 import {MessageResponse} from '../../src/types/MessageTypes';
 
 
-
-const getFavorites = (app: Express): Promise<Testfavorite[]> => {
+export const addFavorite = (
+  url: string | Application,
+  token: string,
+  destination: string,
+): Promise<MessageResponse> => {
   return new Promise((resolve, reject) => {
-    request(app)
-      .get('/api/v1/favorites')
-      .expect(200, (err, response) => {
+    request(url)
+      .post("/api/v1/profile/favorites")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ destination })
+      .expect(200)
+      .end((err, res) => {
+        console.log("Add Favorite Response:", res.body);
         if (err) {
-          reject(err);
-        } else {
-          const favorites: TestFavorite[] = response.body;
-          favorites.forEach((favorite) => {
-            expect(favorite._id).not.toBe('');
-            expect(favorite.favorite_name).not.toBe('');
-          });
-          resolve(favorites);
+          return reject(err);
         }
+        resolve(res.body);
       });
   });
 };
 
-export {getFavorites};
- */
+export const removeFavorite = (
+  url: string | Application,
+  token: string,
+  destination: string,
+): Promise<MessageResponse> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .delete("/api/v1/profile/favorites")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ destination })
+      .expect(200)
+      .end((err, res) => {
+        console.log("Remove Favorite Response:", res.body);
+        if (err) {
+          return reject(err);
+        }
+        resolve(res.body);
+      });
+  });
+};

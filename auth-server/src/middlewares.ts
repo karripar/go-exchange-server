@@ -71,18 +71,8 @@ const authenticate = async (
       next(new CustomError('User is blocked', 403));
       return;
     }
-    // story posting user role:
-    let role = "User";
-    if (user.user_level_id && typeof user.user_level_id === "object") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      role = (user.user_level_id as any).level_name || "User";
-    }
 
-   // res.locals.user = user;
-   res.locals.user = {
-    ...user.toObject(),
-    role: role,
-   };
+    res.locals.user = user;
 
 
     next();
