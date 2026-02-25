@@ -76,14 +76,17 @@ describe('User related tests', () => {
     expect(res.users?.length).toBeGreaterThanOrEqual(1);
   });
 
+  const destination = {
+    destination: 'Test Destination',
+    url: `https://example.com/${randomstring.generate(5)}`,
+  };
+
   it('Should add a favorite destination for the user', async () => {
-    const destinationName = 'Test Destination';
-    await addFavorite(app, testToken, destinationName);
+    await addFavorite(app, testToken, destination);
   });
 
   it('Should remove a favorite destination for the user', async () => {
-    const destinationName = 'Test Destination';
-    await removeFavorite(app, testToken, destinationName);
+    await removeFavorite(app, testToken, destination);
   });
 
   it('should toggle block status of a user', async () => {

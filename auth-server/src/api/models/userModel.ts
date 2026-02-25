@@ -32,7 +32,12 @@ const userSchema = new mongoose.Schema<UserInfo>({
     default: () => new Date().toISOString(),
   },
   favorites: {
-    type: [String],
+    type: [
+      {
+        destination: { type: String, required: true },
+        url: { type: String, required: true },
+      }
+    ],
     required: false,
     default: [],
   },

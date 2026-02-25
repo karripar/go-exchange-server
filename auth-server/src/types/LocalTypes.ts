@@ -20,6 +20,11 @@ type AuthResponse = {
   };
 };
 
+type Favorite = {
+  destination: string;
+  url: string;
+};
+
 // user type for the DB
 type UserInfo = {
   _id: string;
@@ -28,7 +33,7 @@ type UserInfo = {
   email: string;
   user_level_id: number;
   registeredAt: string;
-  favorites: string[];
+  favorites: Favorite[];
   documents: string[];
   exchangeBadge?: boolean;
   avatarUrl?: string;

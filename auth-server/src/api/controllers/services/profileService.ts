@@ -23,7 +23,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 };
 
 export const addFavorite = async (
-  req: Request,
+  req: Request<{}, {}, {destination: string; url: string}>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -33,12 +33,22 @@ export const addFavorite = async (
       return res.status(401).json({error: 'User not authenticated'});
     }
 
-    const {destination} = req.body;
+    const destination = req.body.destination?.trim();
+    const url = req.body.url?.trim();
+
+    if (!destination || !url) {
+      return res.status(400).json({error: 'Destination and URL are required'});
+    }
 
     console.log('Adding favorite destination:', destination);
 
-    if (!destination) {
+    if (!destination || !url) {
       return res.status(400).json({error: 'Destination not found'});
+    }
+
+    const entry = {
+      destination: destination,
+      url: url,
     }
 
     // fetch user from db to add the favorite
@@ -47,10 +57,8 @@ export const addFavorite = async (
       return res.status(404).json({error: 'User not found'});
     }
 
-    if (!user.favorites.includes(destination)) {
-      user.favorites.push(destination);
-      await user.save();
-    }
+    user.favorites.push(entry);
+    await user.save();
 
     res.json(user);
   } catch (error) {
@@ -82,7 +90,7 @@ export const removeFavorite = async (
     }
 
     user.favorites = user.favorites.filter(
-      (fav: string) => fav !== destination,
+      (fav) => fav.destination !== destination
     );
     await user.save();
 

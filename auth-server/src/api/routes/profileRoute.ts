@@ -49,9 +49,8 @@ router.post(
    * @apiSuccessExample {json} Success-Response:
    * HTTP/1.1 200 OK
    * {
-   *  "itemId": "story123",
-   *  "itemType": "story",
-   *  "addedAt": "2025-11-29T10:00:00.000Z"
+   *  "destination": "name",
+   *  "url": "https://example.com",
    * }
    *
    * @apiError (400) {String} BadRequest Missing required fields

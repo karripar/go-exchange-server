@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../middlewares";
-import {getApplicationStages, getApplications, createApplication, updateApplicationPhase, getApplicationDocuments, addApplicationDocument, removeApplicationDocument,
-  submitApplicationPhase, approveApplication, getRequiredDocuments, updateStageStatus,} from "../controllers/profileController";
+import {getApplicationStages, updateApplicationPhase, getApplicationDocuments, getRequiredDocuments, updateStageStatus,} from "../controllers/profileController";
 
 /**
  * @apiDefine ApplicationsGroup Applications
@@ -113,79 +112,9 @@ router.put(
   updateStageStatus
 );
 
-router.get(
-  /**
-   * @api {get} /applications Get user applications
-   * @apiName GetApplications
-   * @apiGroup ApplicationsGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Retrieve all applications for the authenticated user
-   * @apiPermission token
-   *
-   * @apiUse token
-   *
-   * @apiSuccess (200) {Object} applications User applications object
-   * @apiSuccess (200) {String} applications.userId User ID
-   * @apiSuccess (200) {String} applications.currentPhase Current application phase
-   * @apiSuccess (200) {Object[]} applications.applications List of application phases
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 200 OK
-   * {
-   *  "userId": "123",
-   *  "currentPhase": "academic_year",
-   *  "applications": []
-   * }
-   *
-   * @apiUse unauthorized
-   */
-  "/",
-  authenticate,
-  getApplications
-);
 
-router.post(
-  /**
-   * @api {post} /applications Create application
-   * @apiName CreateApplication
-   * @apiGroup ApplicationsGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Create a new application or update existing one for a specific phase
-   * @apiPermission token
-   *
-   * @apiUse token
-   *
-   * @apiBody {String} phase Application phase (academic_year, semester, required_documents, etc.)
-   * @apiBody {Object} data Phase-specific application data
-   *
-   * @apiSuccess (201) {Object} application Created/updated application
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 201 Created
-   * {
-   *  "userId": "123",
-   *  "currentPhase": "academic_year",
-   *  "applications": [
-   *    {
-   *      "phase": "academic_year",
-   *      "data": { "year": "2025-2026" },
-   *      "status": "draft"
-   *    }
-   *  ]
-   * }
-   *
-   * @apiError (400) {String} BadRequest Missing required fields
-   * @apiErrorExample {json} BadRequest:
-   * {
-   *  "message": "Missing required fields"
-   * }
-   *
-   * @apiUse unauthorized
-   */
-  "/",
-  authenticate,
-  createApplication
-);
+
+
 
 router.put(
   /**
@@ -223,101 +152,6 @@ router.put(
   updateApplicationPhase
 );
 
-router.post(
-  /**
-   * @api {post} /applications/:phase/submit Submit application phase
-   * @apiName SubmitApplicationPhase
-   * @apiGroup ApplicationsGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Submit an application phase for review (validates required documents)
-   * @apiPermission token
-   *
-   * @apiUse token
-   *
-   * @apiParam {String} phase Application phase identifier
-   *
-   * @apiSuccess (200) {Object} application Updated application with submitted status
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 200 OK
-   * {
-   *  "userId": "123",
-   *  "applications": [
-   *    {
-   *      "phase": "required_documents",
-   *      "status": "submitted",
-   *      "submittedAt": "2025-11-29T10:00:00.000Z"
-   *    }
-   *  ]
-   * }
-   *
-   * @apiError (400) {String} BadRequest Missing required documents
-   * @apiErrorExample {json} BadRequest:
-   * {
-   *  "message": "Missing required documents",
-   *  "missing": ["passport", "transcript"]
-   * }
-   *
-   * @apiUse unauthorized
-   *
-   * @apiError (404) {String} NotFound Application or phase not found
-   * @apiErrorExample {json} NotFound:
-   * {
-   *  "message": "Application or phase not found"
-   * }
-   */
-  "/:phase/submit",
-  submitApplicationPhase
-);
-
-router.post(
-  /**
-   * @api {post} /applications/:id/approve Approve application
-   * @apiName ApproveApplication
-   * @apiGroup ApplicationsGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Approve a submitted application (admin only)
-   * @apiPermission admin
-   *
-   * @apiUse token
-   *
-   * @apiParam {String} id User's unique ID
-   * @apiBody {String} phase Application phase to approve
-   * @apiBody {String} [reviewNotes] Optional review notes
-   *
-   * @apiSuccess (200) {Object} application Updated application with approved status
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 200 OK
-   * {
-   *  "userId": "123",
-   *  "applications": [
-   *    {
-   *      "phase": "required_documents",
-   *      "status": "approved",
-   *      "reviewedBy": "admin123",
-   *      "reviewedAt": "2025-11-29T10:00:00.000Z"
-   *    }
-   *  ]
-   * }
-   *
-   * @apiUse unauthorized
-   *
-   * @apiError (403) {String} Forbidden Not an admin user
-   * @apiErrorExample {json} Forbidden:
-   * {
-   *  "message": "Forbidden: admin only"
-   * }
-   *
-   * @apiError (404) {String} NotFound Application not found
-   * @apiErrorExample {json} NotFound:
-   * {
-   *  "message": "Application not found"
-   * }
-   */
-  "/:id/approve",
-  approveApplication
-);
 
 router.get(
   /**
@@ -403,80 +237,5 @@ router.get(
   getRequiredDocuments
 );
 
-router.post(
-  /**
-   * @api {post} /applications/documents Add application document
-   * @apiName AddApplicationDocument
-   * @apiGroup ApplicationsGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Add a document link to an application phase
-   * @apiPermission token
-   *
-   * @apiUse token
-   *
-   * @apiBody {String} phase Application phase
-   * @apiBody {String} documentType Type of document
-   * @apiBody {String} fileName File name
-   * @apiBody {String} fileUrl File URL
-   * @apiBody {String} sourceType Source type (google_drive, onedrive, dropbox, etc.)
-   * @apiBody {String} [notes] Optional notes
-   *
-   * @apiSuccess (201) {Object} document Created document object
-   * @apiSuccess (201) {String} document.id Document ID
-   * @apiSuccess (201) {String} document.documentType Document type
-   * @apiSuccess (201) {String} document.fileUrl File URL
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 201 Created
-   * {
-   *  "id": "doc123",
-   *  "documentType": "passport",
-   *  "fileName": "passport.pdf",
-   *  "fileUrl": "https://drive.google.com/...",
-   *  "sourceType": "google_drive",
-   *  "addedAt": "2025-11-29T10:00:00.000Z"
-   * }
-   *
-   * @apiError (400) {String} BadRequest Missing required fields or invalid source type
-   * @apiErrorExample {json} BadRequest:
-   * {
-   *  "message": "Missing required fields"
-   * }
-   *
-   * @apiUse unauthorized
-   */
-  "/documents",
-  addApplicationDocument
-);
-
-router.delete(
-  /**
-   * @api {delete} /applications/documents/:documentId Remove application document
-   * @apiName RemoveApplicationDocument
-   * @apiGroup ApplicationsGroup
-   * @apiVersion 1.0.0
-   * @apiDescription Remove a document from an application
-   * @apiPermission token
-   *
-   * @apiUse token
-   *
-   * @apiParam {String} documentId Document's unique ID
-   *
-   * @apiSuccess (204) No content
-   *
-   * @apiSuccessExample {json} Success-Response:
-   * HTTP/1.1 204 No Content
-   *
-   * @apiUse unauthorized
-   *
-   * @apiError (404) {String} NotFound Document not found
-   * @apiErrorExample {json} NotFound:
-   * {
-   *  "message": "Document not found"
-   * }
-   */
-  "/documents/:documentId",
-  removeApplicationDocument
-);
 
 export default router;
