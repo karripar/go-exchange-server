@@ -10,7 +10,7 @@ import {
   addFaultyContact,
 } from "./controllers/testContact";
 import {
-  getDestinations,
+  //getDestinations,
   getDestinationsInvalidParams,
   getDestinationUrls,
   updateDestinationUrl,
