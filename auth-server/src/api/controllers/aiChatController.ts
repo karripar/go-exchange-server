@@ -26,8 +26,22 @@ export const aiChatTurn = async (
     }
 
     const useV2 = process.env.VA_CHAT_USE_V2 === '1';
+    const mode = useV2 ? 'v2' : 'v1';
     const targetPath = useV2 ? '/api/turn_response_v2' : '/api/turn_response';
     const targetUrl = `${VA_CHAT_SERVICE_URL.replace(/\/$/, '')}${targetPath}`;
+    const requestIdHeader = req.headers['x-request-id'];
+    const requestId =
+      typeof requestIdHeader === 'string' && requestIdHeader.trim().length > 0
+        ? requestIdHeader
+        : `proxy-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    res.setHeader('X-VA-Chat-Mode', mode);
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(
+        `[ai-chat-proxy] request_id=${requestId} mode=${mode} upstream=${targetUrl}`,
+      );
+    }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

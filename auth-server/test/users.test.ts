@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import mongoose from 'mongoose';
 import app from '../src/app';
 import dotenv from 'dotenv';
